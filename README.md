@@ -2,7 +2,7 @@
 
 La tienda de Perpetuo: muestra la mercancía de la revista y la vende con Stripe. Está hecha sobre el molde de `eventos` (mismo brandbook, mismas piezas, mismo flujo de pago), pero en blanco y con lo mínimo.
 
-> **Estado: en modo demostración.** El sitio funciona completo con pagos simulados. Falta la foto del suéter, las existencias reales y conectar Stripe.
+> **Estado: en modo demostración.** El sitio funciona completo con pagos simulados. Falta la foto del suéter, las existencias reales y conectar Stripe (la sección Instalación, que se hace una sola vez desde las cuentas de Stripe y Google).
 
 ## Archivos
 - `index.html`: el sitio público. La portada con una foto grande, el recorrido pieza por pieza y el índice, la página de cada pieza (`#/p/slug`), la bolsa (un cajón lateral) y el recibo después de pagar (`#/pedido`).
@@ -46,7 +46,7 @@ Cada producto es un renglón de la pestaña **Productos** de la hoja:
 **Existencias.** En `variantes` va lo que se fabricó, y no se toca con cada venta: lo disponible es eso menos lo que hay en pedidos `pendiente`, `pagado`, `enviado` o `entregado`. Para resurtir, sube el número.
 
 ## Modo demostración
-Con `CONFIG.API_URL` vacío (así viene), todo funciona en el navegador con `localStorage`: cinco piezas: las tres gorras ($500) y la bolsa para libros ($300), ya con foto, y el suéter ($600), todavía provisional, pago simulado y recibo. En el navegador, `localStorage.removeItem("perpetuo-tienda-demo-7")` vuelve a las existencias de ejemplo.
+Con `CONFIG.API_URL` vacío (así viene), todo funciona en el navegador con `localStorage`: cinco piezas: las tres gorras ($450) y la bolsa para libros ($300), ya con foto, y el suéter ($600), todavía provisional, pago simulado y recibo. En el navegador, `localStorage.removeItem("perpetuo-tienda-demo-8")` vuelve a las existencias de ejemplo.
 
 Para verlo en la computadora:
 
@@ -60,7 +60,7 @@ y abrir http://localhost:8000.
 1. La persona agrega piezas a su bolsa (se guarda en su navegador) y le da clic a **Pagar con tarjeta**.
 2. `Tienda.gs` revisa precios y existencias **contra la hoja** (nunca le cree al navegador), anota el pedido como `pendiente` y crea una sesión de **Stripe Checkout** en pesos y en español. Las piezas quedan apartadas 31 minutos.
 3. En Stripe la persona escribe su correo, su teléfono, su **dirección de envío** y su tarjeta. El envío se cobra ahí: tarifa plana de $100 a todo México (`AJUSTES` en `Tienda.gs`; ahí mismo se puede poner un monto a partir del cual sea gratis).
-4. Stripe la regresa a `?pago=ok&session_id=…`. La página llama a `confirmar` y el backend **le pregunta a Stripe** si la sesión está pagada. Si sí, guarda nombre, correo, teléfono y dirección, marca el pedido como `pagado` y manda el recibo por correo una sola vez.
+4. Stripe la regresa a `?pago=ok&session_id=…`. La página llama a `confirmar` y el backend **le pregunta a Stripe** si la sesión está pagada. Si sí, guarda nombre, correo, teléfono y dirección, marca el pedido como `pagado`, manda el recibo por correo una sola vez y avisa a general@perpetuo.global (`AJUSTES.AVISAR_A`) que hay un pedido nuevo.
 5. Si la persona cierra la ventana antes de volver, el disparador `revisarPendientes` (cada 10 min) confirma el pago y manda el recibo de todos modos. Las sesiones que vencen sin pago pasan a `expirado` y liberan las piezas.
 
 **Para surtir:** los pedidos `pagado` están en la pestaña **Pedidos** con artículos y dirección. Al mandar el paquete, cambia el estado a `enviado` y anota la guía.
@@ -68,12 +68,12 @@ y abrir http://localhost:8000.
 ## Instalación
 
 ### 1. Stripe
-En dashboard.stripe.com → Desarrolladores → Claves de API, crea una **clave restringida** con permiso de escritura en *Checkout Sessions* y de lectura en *Account*. Para probar, hazlo en modo de prueba.
+En dashboard.stripe.com → Desarrolladores → Claves de API, crea una **clave restringida** con permiso de escritura en *Checkout Sessions* (no necesita nada más). Para probar, hazlo en modo de prueba.
 
 ### 2. Apps Script
 1. En script.google.com, crea un proyecto llamado "Perpetuo · Tienda" y pega `Tienda.gs`.
 2. En Configuración del proyecto, cambia la zona horaria a `America/Mexico_City` y agrega la propiedad `STRIPE_SECRET` con la clave del paso 1.
-3. Ejecuta `instalar()` y acepta los permisos. Crea la hoja **"Perpetuo · Tienda"** (pestañas Productos y Pedidos) y el disparador de cada 10 minutos.
+3. Ejecuta `instalar()` y acepta los permisos. Crea la hoja **"Perpetuo · Tienda"** (pestañas Productos y Pedidos), con las tres gorras y la bolsa publicadas y el suéter en `borrador`, y el disparador de cada 10 minutos.
 4. Ejecuta `probarStripe()` y después `probarCorreo()`.
 5. Implementar → Nueva implementación → Aplicación web, con Ejecutar como: **yo** y Quién tiene acceso: **cualquier usuario**.
 6. Pega la URL `/exec` en `CONFIG.API_URL` de `assets/comun.js`.
@@ -88,7 +88,8 @@ En dashboard.stripe.com → Desarrolladores → Claves de API, crea una **clave 
 Con la clave de prueba, compra algo con la tarjeta `4242 4242 4242 4242`. Revisa que llegue el correo, que el pedido aparezca como `pagado` en la hoja con su dirección y que las existencias bajen. Después cambia a la clave real.
 
 ## Para tener en cuenta
-- **`Tienda.gs` todavía no se ha probado contra Stripe ni Apps Script reales**; solo se revisó su sintaxis. El paso 4 de arriba es esa prueba.
+- **`Tienda.gs` se probó completo contra una hoja y un Stripe simulados** (pedido, pago, recibo, existencias, vencimiento), pero todavía no contra los reales. El paso 4 de arriba es esa prueba.
+- **Los datos de quien compra** (nombre, correo, teléfono y dirección) los pide Stripe Checkout y quedan en la pestaña **Pedidos** de la hoja, igual que los registros de `eventos`. Los cambios hechos a mano en la hoja tardan hasta un minuto en verse en el sitio.
 - **Falta el panel de administración** (como `admin.html` en `eventos`): por ahora, productos y pedidos se manejan directo en la hoja.
 - **Reembolsos.** Se hacen en el dashboard de Stripe. Después, en la hoja, cambia el estado del pedido a `reembolsado` para liberar las piezas.
 - **Límite de correos.** Apps Script manda unos 100 correos al día con Gmail normal y 1,500 con Workspace.
