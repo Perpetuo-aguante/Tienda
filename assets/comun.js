@@ -1,7 +1,7 @@
 /* Tienda · Perpetuo — piezas compartidas */
 
 const CONFIG = {
-  API_URL: "", // URL /exec de la aplicación web de Tienda.gs; vacío = modo demostración (todo vive en este navegador)
+  API_URL: "https://script.google.com/macros/s/AKfycbyHtZgpwRqybgkazGgqDoHl2VUdK3hsnA6kXB9J8IV_Axxb_BTbQU_WXUT8lLvn7JFI/exec", // URL /exec de la aplicación web de Tienda.gs; vacío = modo demostración (todo vive en este navegador)
   MAX_POR_ARTICULO: 10,
   CLAVE_CACHE: "perpetuo-tienda-cache",
   CLAVE_BOLSA: "perpetuo-tienda-bolsa"

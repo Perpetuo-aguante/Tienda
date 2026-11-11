@@ -2,7 +2,7 @@
 
 La tienda de Perpetuo: muestra la mercancía de la revista y la vende con Stripe. Está hecha sobre el molde de `eventos` (mismo brandbook, mismas piezas, mismo flujo de pago), pero en blanco y con lo mínimo.
 
-> **Estado: en modo demostración.** El sitio funciona completo con pagos simulados. Falta la foto del suéter, las existencias reales y conectar Stripe (la sección Instalación, que se hace una sola vez desde las cuentas de Stripe y Google).
+> **Estado: conectada a Stripe.** `CONFIG.API_URL` apunta al backend en Apps Script; productos, existencias y pedidos viven en la hoja "Perpetuo · Tienda". Falta la foto del suéter (está en `borrador`) y la prueba completa del paso 4.
 
 ## Archivos
 - `index.html`: el sitio público. La portada con una foto grande, el recorrido pieza por pieza y el índice, la página de cada pieza (`#/p/slug`), la bolsa (un cajón lateral) y el recibo después de pagar (`#/pedido`).
@@ -46,7 +46,7 @@ Cada producto es un renglón de la pestaña **Productos** de la hoja:
 **Existencias.** En `variantes` va lo que se fabricó, y no se toca con cada venta: lo disponible es eso menos lo que hay en pedidos `pendiente`, `pagado`, `enviado` o `entregado`. Para resurtir, sube el número.
 
 ## Modo demostración
-Con `CONFIG.API_URL` vacío (así viene), todo funciona en el navegador con `localStorage`: cinco piezas: las tres gorras ($450) y la bolsa para libros ($300), ya con foto, y el suéter ($600), todavía provisional, pago simulado y recibo. En el navegador, `localStorage.removeItem("perpetuo-tienda-demo-8")` vuelve a las existencias de ejemplo.
+Con `CONFIG.API_URL` vacío, todo funciona en el navegador con `localStorage`: cinco piezas: las tres gorras ($450) y la bolsa para libros ($300), ya con foto, y el suéter ($600), todavía provisional, pago simulado y recibo. En el navegador, `localStorage.removeItem("perpetuo-tienda-demo-8")` vuelve a las existencias de ejemplo.
 
 Para verlo en la computadora:
 
